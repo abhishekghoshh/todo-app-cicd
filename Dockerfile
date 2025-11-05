@@ -15,7 +15,7 @@ COPY . .
 # Build the Go application
 # CGO_ENABLED=0 disables Cgo, creating a static binary
 # -o /go-htmx-todo specifies the output file
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go-htmx-todo .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go-htmx-todo ./src/main
 
 # --- Final Stage ---
 # Use a minimal alpine image
@@ -27,7 +27,7 @@ WORKDIR /app
 COPY --from=builder /go-htmx-todo .
 
 # Copy templates
-COPY templates ./templates
+COPY ./src/resources/ ./src/resources/
 
 # Create the uploads directory
 # Note: Data in here will be lost unless a volume is mounted

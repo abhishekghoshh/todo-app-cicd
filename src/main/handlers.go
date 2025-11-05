@@ -30,7 +30,7 @@ func InitHandlers(ttl time.Duration) {
 	}
 
 	// Parse all templates
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	tpl = template.Must(template.ParseGlob("src/resources/templates/*.html"))
 }
 
 // A new type for our context keys to avoid collisions

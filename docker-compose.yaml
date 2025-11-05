@@ -1,7 +1,7 @@
 
 services:
   # The Go Application
-  app:
+  todo-app:
     container_name: todo-app
     image: abhishek1009/todo-app:latest
     build:
@@ -20,20 +20,27 @@ services:
       # Pass the MONGO_URI from the .env file
       - MONGO_URI=${MONGO_URI}
     depends_on:
-      - mongo # Wait for the mongo service to be ready
+      - mongodb # Wait for the mongo service to be ready
     restart: unless-stopped
     networks:
       - todo-network
 
   # The MongoDB Database
-  mongo:
-    image: mongo:latest # Use the official MongoDB image
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
     ports:
-      # Optionally expose the DB port to the host for debugging
       - "27017:27017"
     volumes:
       # Persist database data
       - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    command:
+      - --storageEngine
+      - wiredTiger
+      - --auth
     restart: unless-stopped
     networks:
       - todo-network
