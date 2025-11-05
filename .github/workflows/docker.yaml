@@ -2,7 +2,7 @@
 
 
 # This workflow builds and pushes a Docker image to Docker Hub
-name: Build and Push Sandbox Image
+name: Build and Push Todo App Docker Image
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
@@ -23,6 +23,11 @@ on:
 jobs:
   publish_images:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.APP_IMAGE_NAME }}
+      IMAGE_TAG: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,12 +48,12 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/todo-app:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/todo-app:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:cache
           cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:cache,mode=max
       - name: Update image tag in Helm values.yaml
-        run: echo "${{ vars.DOCKERHUB_USERNAME }}/todo-app:${{ github.sha }}"
+        run: echo "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
 
 
