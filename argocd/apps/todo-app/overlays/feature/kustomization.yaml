@@ -15,10 +15,9 @@ helmCharts:
     version:  1.0.0
     namespace: todo-app-feature
     # base values file
-    valuesFiles:
-      - ../../base/values.yaml  # (Step 1) Load the common values
-      - values.yaml             # (Step 2) Load 'values.yaml' from *this* directory
-
-      # 4. Your inline values (this part was correct)
+    valuesFile: ../../base/values.yaml
+    # overlay values file that will override the base
+    additionalValuesFiles:
+      - values.yaml
     valuesInline:
       nameOverride: todo-app-feature
