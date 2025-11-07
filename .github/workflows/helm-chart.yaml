@@ -25,7 +25,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       HELM_REGISTRY: ${{ vars.HELM_REGISTRY }}
       HELM_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-      CHART_TAG: ${{ github.sha }}
+      CHART_VERSION: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,7 +40,10 @@ jobs:
           helm push ./packages/todo-app-*.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
       - name: Build and push the helm chart with commit sha as version
         run: |
-          helm package helm --version $CHART_TAG
+          # strip the github sha to first 9 characters
+          VERSION=${GITHUB_SHA::9}
+          CHART_TAG="0.1.0-$VERSION"
+          helm package helm --version $CHART_TAG --destination ./packages
           helm push ./packages/todo-app-$CHART_TAG.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
 
 
