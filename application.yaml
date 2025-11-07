@@ -5,17 +5,18 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
   source:
-    repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
+    repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: feature
     path: argocd
     directory:
       recurse: true
       jsonnet: {}
       exclude: '{**/apps/**,**/argo-apps/**}'
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd
+  sources: []
   syncPolicy:
     automated:
       prune: true
