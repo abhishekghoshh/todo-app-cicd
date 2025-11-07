@@ -18,7 +18,7 @@ on:
 
 
 jobs:
-  publish_images:
+  publish_helm_chart:
     runs-on: ubuntu-latest
     env:
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -36,10 +36,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push the helm chart with version from chart.yaml
         run: |
+          echo $PWD
+          ls -alh
+          # mkdir -p ./packages
           helm package helm/todo-app --destination ./packages
           helm push ./packages/todo-app-*.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
       - name: Build and push the helm chart with commit sha as version
         run: |
+          # mkdir -p ./packages
           helm package helm/todo-app --version $CHART_TAG
           helm push ./packages/todo-app-$CHART_TAG.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
 
