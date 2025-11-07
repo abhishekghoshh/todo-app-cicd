@@ -10,6 +10,8 @@ spec:
     targetRevision: feature
     ref: argorepo
     path: argocd/apps/todo-app/overlays/feature
+    kustomize:
+      enableHelm: true
   destination:
     server: https://kubernetes.default.svc
     namespace: todo-app-feature
