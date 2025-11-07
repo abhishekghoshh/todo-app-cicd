@@ -1,0 +1,47 @@
+## See this video for refference : https://www.youtube.com/watch?v=x7f9x30W_dI
+
+
+# This workflow builds and pushes a Docker image to Docker Hub
+name: Build and Push Todo App helm chart to docker Helm Registry
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on: 
+  # workflow_dispatch: {}
+  push:
+    branches: ["feature"]
+    paths:
+      - 'helm/**'
+  # pull_request:
+  #   branches: ["dev", "uat", "prod"]
+
+
+jobs:
+  publish_images:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      HELM_REGISTRY: ${{ vars.HELM_REGISTRY }}
+      HELM_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      CHART_TAG: ${{ github.sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push the helm chart with version from chart.yaml
+        run: |
+          helm package helm/todo-app --destination ./packages
+          helm push ./packages/todo-app-*.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+      - name: Build and push the helm chart with commit sha as version
+        run: |
+          helm package helm/todo-app --version $CHART_TAG
+          helm push ./packages/todo-app-$CHART_TAG.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+
+
+
+
