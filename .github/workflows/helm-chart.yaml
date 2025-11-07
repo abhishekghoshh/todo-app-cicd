@@ -37,13 +37,14 @@ jobs:
       - name: Build and push the helm chart with version from chart.yaml
         run: |
           helm package helm --destination ./packages
-          helm push ./packages/todo-app-*.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+          # helm push ./packages/todo-app-*.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
       - name: Build and push the helm chart with commit sha as version
         run: |
           # strip the github sha to first 9 characters
           VERSION=${GITHUB_SHA::9}
           CHART_TAG="0.1.0-$VERSION"
           helm package helm --version $CHART_TAG --destination ./packages
+          ls ./packages -alh
           helm push ./packages/todo-app-$CHART_TAG.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
 
 
