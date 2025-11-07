@@ -35,18 +35,33 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push the helm chart with version from chart.yaml
         run: |
+          # Find chart name from Chart.yaml and remove quotes from chart name if any
           CHART_NAME=$(grep 'name:' helm/Chart.yaml | awk '{print $2}')
-          VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_NAME=${CHART_NAME//\"/}
+
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
           helm package helm --destination ./packages
-          helm push ./packages/$CHART_NAME-$VERSION.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+          helm push ./packages/$CHART_NAME-$CHART_VERSION.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+
       - name: Build and push the helm chart with commit sha as version
         run: |
+          # Find chart name from Chart.yaml and remove quotes from chart name if any
           CHART_NAME=$(grep 'name:' helm/Chart.yaml | awk '{print $2}')
-          # strip the github sha to first 7 characters
-          VERSION=${GITHUB_SHA::7}
-          CHART_TAG="0.1.0-$VERSION"
-          helm package helm --version $CHART_TAG --destination ./packages
-          helm push ./packages/$CHART_NAME-$CHART_TAG.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+          CHART_NAME=${CHART_NAME//\"/}
+
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          # strip the github sha to first 7 characters and append to chart version
+          CHART_VERSION_FROM_COMMIT=${GITHUB_SHA::7}
+          CHART_VERSION_FROM_COMMIT="$CHART_VERSION-$CHART_VERSION_FROM_COMMIT"
+
+          helm package helm --version $CHART_VERSION_FROM_COMMIT --destination ./packages
+          helm push ./packages/$CHART_NAME-$CHART_VERSION_FROM_COMMIT.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
 
 
 
