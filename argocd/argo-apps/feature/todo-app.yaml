@@ -8,9 +8,8 @@ spec:
   source:
     repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: feature
+    ref: argorepo
     path: argocd/apps/todo-app/overlays/feature
-    directory:
-      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: todo-app-feature
