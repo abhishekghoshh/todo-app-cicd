@@ -4,7 +4,7 @@ metadata:
   name: root-application
   namespace: argocd
 spec:
-  project: todo-app-cicd
+  project: default
   source:
     repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
     targetRevision: feature

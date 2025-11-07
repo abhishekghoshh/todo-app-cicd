@@ -4,7 +4,7 @@ metadata:
   name: k8s-cluster-feature
   namespace: argocd
 spec:
-  project: todo-app-cicd
+  project: default
   source:
     repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
     targetRevision: feature
@@ -25,7 +25,7 @@ metadata:
   name: k8s-cluster-dev
   namespace: argocd
 spec:
-  project: todo-app-cicd
+  project: default
   source:
     repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
     targetRevision: dev
