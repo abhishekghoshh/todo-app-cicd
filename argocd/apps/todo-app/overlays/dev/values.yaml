@@ -1,0 +1,9 @@
+nameOverride: "todo-app-dev"
+
+deployment:
+  app:
+    expose:
+      host: "app-todo-dev.local"
+  db:
+    expose:
+      host: "mongo-dev.local"
