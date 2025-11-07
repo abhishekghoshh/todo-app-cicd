@@ -19,5 +19,5 @@ helmCharts:
     # overlay values file that will override the base
     additionalValuesFiles:
       - values.yaml
-    valuesInline:
-      nameOverride: todo-app-dev
+    # valuesInline:
+    #   nameOverride: todo-app-dev
