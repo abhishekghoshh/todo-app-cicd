@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
+    repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: feature
     path: argocd/argo-apps/feature
     directory:
@@ -27,7 +27,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:abhishekghoshh/todo-app-cicd.git
+    repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: dev
     path: argocd/argo-apps/dev
     directory:
