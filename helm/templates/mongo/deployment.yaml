@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-app-chart.mongodb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- with .Values.deployment.db.metadata.labels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  annotations:
+{{- with .Values.deployment.db.metadata.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.deployment.db.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "todo-app-chart.mongodb.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "todo-app-chart.mongodb.fullname" . }}
+{{- with .Values.deployment.db.podMetadata.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+      annotations:
+{{- with .Values.deployment.db.podMetadata.annotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: mongo
+          image: "{{- if .Values.deployment.db.image.host }}{{ .Values.deployment.db.image.host }}/{{ end }}{{ .Values.deployment.db.image.name }}:{{ .Values.deployment.db.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.db.image.pullPolicy }}
+          ports:
+            - name: mongo
+              containerPort: {{ .Values.deployment.db.port }}
+          
+          # This mounts the persistent volume into the container
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db # Default MongoDB data directory
+          
+          resources:
+{{ toYaml .Values.deployment.db.resources | indent 12 }}
+      
+      # This links the volumeMount to the PVC
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: {{ include "todo-app-chart.mongodb.fullname" . }}-pvc

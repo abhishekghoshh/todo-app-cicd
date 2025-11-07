@@ -1,0 +1,29 @@
+{{- if .Values.deployment.app.expose.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "todo-app-chart.fullname" . }}-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # This annotation specifies the Nginx Ingress controller
+    kubernetes.io/ingress.class: {{ .Values.deployment.app.expose.ingressType }}
+    
+    # --- Additional user-defined annotations
+{{- with .Values.deployment.app.expose.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  ingressClassName: {{ .Values.deployment.app.expose.ingressType }}
+  rules:
+    - host: {{ .Values.deployment.app.expose.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # This points to the service from 06-app-service.yaml
+                name: {{ include "todo-app-chart.fullname" . }}-svc
+                port:
+                  number: {{ .Values.deployment.app.port }}
+{{- end }}

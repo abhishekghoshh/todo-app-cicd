@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-app-chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- with .Values.deployment.app.metadata.labels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  annotations:
+{{- with .Values.deployment.app.metadata.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.deployment.app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "todo-app-chart.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "todo-app-chart.fullname" . }}
+{{- with .Values.deployment.app.podMetadata.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+      annotations:
+{{- with .Values.deployment.app.podMetadata.annotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: app
+          image: "{{- if .Values.deployment.app.image.host }}{{ .Values.deployment.app.image.host }}/{{ end }}{{ .Values.deployment.app.image.name }}:{{ .Values.deployment.app.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.app.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.app.port }}
+          
+          # --- Environment variables injected directly ---
+          env:
+            - name: SESSION_TTL_MINUTES
+              value: {{ .Values.deployment.app.env.sessionTtlMinutes | quote }}
+            
+            # This dynamically builds the connection string to point
+            # to the MongoDB service we created in 03-mongo-service.yaml
+            - name: MONGO_URI
+              value: "mongodb://{{ include "todo-app-chart.mongodb.fullname" . }}-svc:{{ .Values.deployment.db.port }}"
+          
+          # Mount the persistent volume for file uploads
+          volumeMounts:
+            - name: uploads-storage
+              mountPath: /app/uploads # This MUST match the 'uploadDir' in your Go code
+          
+          resources:
+{{ toYaml .Values.deployment.app.resources | indent 12 }}
+      
+      volumes:
+        - name: uploads-storage
+          persistentVolumeClaim:
+            claimName: {{ include "todo-app-chart.fullname" . }}-uploads-pvc
