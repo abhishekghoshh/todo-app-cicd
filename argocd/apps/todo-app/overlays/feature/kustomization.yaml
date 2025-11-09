@@ -11,7 +11,7 @@ transformers: []
 # Helm chart definition with values overlay
 helmCharts:
   - name: todo-app-chart
-    repo: https://registry-1.docker.io/abhishek1009
+    repo: oci://registry-1.docker.io/abhishek1009
     version:  1.0.0
     namespace: todo-app-feature
     # base values file
