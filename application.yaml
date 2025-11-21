@@ -10,7 +10,7 @@ spec:
     namespace: argocd
   source:
     repoURL: https://github.com/abhishekghoshh/todo-app-cicd
-    targetRevision: feature
+    targetRevision: ${targetEnvironment}
     path: argocd/argo-apps/${targetEnvironment}
     # directory:
     #   recurse: true

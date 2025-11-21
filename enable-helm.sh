@@ -11,7 +11,7 @@ echo "📌 Patching argocd-cm with --enable-helm"
 
 kubectl patch configmap argocd-cm -n argocd \
   --type merge \
-  -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}' || {
+  -p '{"data":{"kustomize.buildOptions":"--enable-helm --load-restrictor LoadRestrictionsNone"}}' || {
 
   echo "❗ argocd-cm not found. Creating a new one..."
 
@@ -22,7 +22,7 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
-  kustomize.buildOptions: "--enable-helm"
+  kustomize.buildOptions: "--enable-helm --load-restrictor LoadRestrictionsNone"
 EOF
 }
 
