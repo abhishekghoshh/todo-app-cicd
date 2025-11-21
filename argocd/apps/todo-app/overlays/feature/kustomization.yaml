@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: todo-app
 
-resources: []
-# - ../../base
+resources:
+- ../../base
 
 
 transformers: []
@@ -15,9 +15,9 @@ helmCharts:
     version:  1.0.0
     namespace: todo-app
     # base values file
-    valuesFile: values.yaml
+    valuesFile: ../../base/values.yaml
     # overlay values file that will override the base
-    # additionalValuesFiles:
-    #   - values.yaml
+    additionalValuesFiles:
+      - values.yaml
     valuesInline:
       nameOverride: todo-app

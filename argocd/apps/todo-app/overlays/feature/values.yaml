@@ -1,97 +1,9 @@
-# -- Common override for chart name
-nameOverride: ""
+nameOverride: "todo-app"
 
 deployment:
   app:
-    replicas: 1
-
-    # -- Overrides the chart-generated name.
-    name: "todo-app"
-    image:
-      host: "" # Optional registry host (e.g., gcr.io)
-      name: "abhishek1009/todo-app"
-      tag: "latest"
-      pullPolicy: IfNotPresent
-    port: 8080
-    
-    # -- Additional metadata for the Deployment object
-    metadata:
-      annotations: {}
-      labels: {}
-      
-    # -- Additional metadata for the Pods
-    podMetadata:
-      annotations: {}
-      labels: {}
-
-    # -- Environment variables passed to the Go app
-    env:
-      sessionTtlMinutes: "10"
-
     expose:
-      enabled: true
-      # -- Type of Ingress controller
-      ingressType: "nginx"
-      host: "app.todo.local"
-      # -- Additional annotations for the Ingress
-      annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "20m"
-
-    # -- Storage for the /app/uploads directory
-    pvc:
-      size: 1Gi
-      storageClassName: "standard"
-
-    # -- Resource requests and limits
-    resources:
-      requests:
-        cpu: "200m"
-        memory: "256Mi"
-      limits:
-        cpu: "1000m"
-        memory: "1024Mi"
-
+      host: "app-todo.local"
   db:
-    replicas: 1
-
-    # -- Overrides the chart-generated name.
-    name: "mongodb"
-    image:
-      host: "" # Optional registry host
-      name: "mongo"
-      tag: "latest"
-      pullPolicy: IfNotPresent
-    port: 27017
-
-    # -- Additional metadata for the Deployment object
-    metadata:
-      annotations: {}
-      labels: {}
-      
-    # -- Additional metadata for the Pods
-    podMetadata:
-      annotations: {}
-      labels: {}
-
-    # -- DANGEROUS: Exposing a database via Ingress is a major security risk
-    # -- and will not work for standard Mongo clients as Ingress is for HTTP/S.
-    # -- This is defaulted to false for security.
     expose:
-      enabled: false
-      ingressType: "nginx"
       host: "mongo.local"
-      annotations: {}
-
-    # -- Storage for the /data/db directory
-    pvc:
-      size: 8Gi
-      storageClassName: "standard"
-
-    # -- Resource requests and limits
-    resources:
-      requests:
-        cpu: "200m"
-        memory: "256Mi"
-      limits:
-        cpu: "1000m"
-        memory: "1024Mi"
