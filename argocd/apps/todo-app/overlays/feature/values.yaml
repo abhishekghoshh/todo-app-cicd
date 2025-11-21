@@ -1,9 +1,9 @@
-nameOverride: "todo-app-feature"
+nameOverride: "todo-app"
 
 deployment:
   app:
     expose:
-      host: "app-todo-feature.local"
+      host: "app-todo.local"
   db:
     expose:
-      host: "mongo-feature.local"
+      host: "mongo.local"

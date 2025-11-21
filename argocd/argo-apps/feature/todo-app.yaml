@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: todo-app-feature
+  name: todo-app
   namespace: argocd
 spec:
   project: default
@@ -14,7 +14,7 @@ spec:
       enableHelm: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: todo-app-feature
+    namespace: todo-app
   syncPolicy:
     automated:
       prune: true

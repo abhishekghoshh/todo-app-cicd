@@ -11,11 +11,7 @@ spec:
   source:
     repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: feature
-    path: argocd
-    directory:
-      recurse: true
-      jsonnet: {}
-      exclude: '{**/apps/**,**/argo-apps/**}'
+    path: argocd/argo-apps/${targetEnvironment}
   sources: []
   syncPolicy:
     automated:
