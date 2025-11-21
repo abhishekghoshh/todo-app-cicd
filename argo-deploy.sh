@@ -8,6 +8,13 @@ if [ -z "$1" ]; then
 fi
 
 if [ "$1" == "destroy" ]; then
+    echo "🗑️ Removing ArgoCD applications first..."
+    kubectl delete applications --all --all-namespaces || echo "⚠️ No applications found, skipping deletion"
+    kubectl delete appprojects --all --all-namespaces || echo "⚠️ No app projects found, skipping deletion"
+    
+    echo "⏳ Waiting for applications to be cleaned up..."
+    sleep 10
+    
     echo "🗑️ Uninstalling ArgoCD..."
     kubectl delete -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml || echo "⚠️ ArgoCD resources not found, skipping deletion"
     kubectl delete namespace argocd || echo "⚠️ ArgoCD namespace not found, skipping deletion"
