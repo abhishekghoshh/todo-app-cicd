@@ -3,7 +3,7 @@ nameOverride: "todo-app"
 deployment:
   app:
     expose:
-      host: "app-todo.local"
+      host: "app.todo.local"
   db:
     expose:
       host: "mongo.local"
