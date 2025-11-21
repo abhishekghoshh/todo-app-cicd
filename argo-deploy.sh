@@ -47,6 +47,8 @@ else
         -n argocd \
         --for=condition=Available=True \
         --timeout=180s
+
+    ./enable-helm.sh
     
     echo "✅ ArgoCD is ready!"
 fi
