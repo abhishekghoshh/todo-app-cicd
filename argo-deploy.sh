@@ -57,8 +57,8 @@ fi
 echo "🔧 Rendering root application..."
 
 # Substitute ${targetEnvironment} → actual env
-TARGET_ENV="$TARGET_ENV" envsubst < "$ROOT_FILE" > "$TEMP_FILE"
-
+export targetEnvironment="$TARGET_ENV"
+envsubst '${targetEnvironment}' < "$ROOT_FILE" > "$TEMP_FILE"
 echo "📄 Rendered file:"
 cat "$TEMP_FILE"
 
