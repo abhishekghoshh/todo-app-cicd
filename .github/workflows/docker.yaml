@@ -23,6 +23,8 @@ on:
 jobs:
   publish_images:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
