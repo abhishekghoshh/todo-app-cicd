@@ -140,7 +140,7 @@ jobs:
             
             CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
             
-            NEW_BODY="Helm chart updated with version $CHART_VERSION_WITH_COMMIT_ID 
+            NEW_BODY="Helm Chart updated with version $CHART_VERSION_WITH_COMMIT_ID 
             Commit message : $COMMIT_MSG
 
             $CURRENT_BODY"
