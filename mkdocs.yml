@@ -1,7 +1,7 @@
 site_name: Todo App CI/CD Pipeline
 site_description: A comprehensive GitOps-powered CI/CD pipeline for a modern Go-based Todo application
 site_author: Abhishek Ghosh
-site_url: https://github.com/abhishekghoshh/todo-app-cicd
+site_url: https://abhishekghoshh.github.io/todo-app-cicd
 
 repo_name: abhishekghoshh/todo-app-cicd
 repo_url: https://github.com/abhishekghoshh/todo-app-cicd
@@ -36,6 +36,7 @@ theme:
     - search.highlight
     - content.code.copy
     - content.code.annotate
+  language: en
   icon:
     repo: fontawesome/brands/github
 
@@ -101,8 +102,10 @@ markdown_extensions:
       permalink: true
 
 plugins:
+  - social
   - search
   - tags
+  - mkdocs-pdf
 
 extra:
   social:
@@ -110,10 +113,15 @@ extra:
       link: https://github.com/abhishekghoshh
     - icon: fontawesome/brands/docker
       link: https://hub.docker.com/u/abhishek1009
+    - icon: fontawesome/brands/twitter
+      link: https://x.com/abhishek_ghoshh
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/abhishek-ghosh-220679132/
   version:
     provider: mike
 
-extra_css:
-  - stylesheets/extra.css
+# extra_css:
+#   - stylesheets/extra.css
 
-copyright: Copyright &copy; 2025 Abhishek Ghosh
+copyright: |
+  &copy; 2025 <a href="https://github.com/abhishekghoshh"  target="_blank" rel="noopener">Abhishek Ghosh</a>
