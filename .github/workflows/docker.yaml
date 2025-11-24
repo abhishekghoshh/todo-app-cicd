@@ -65,26 +65,27 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:cache
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
-      - name: Update image tag in Helm values.yaml
-        run: |
-            VERSION=$(cat version)
-            IMAGE_TAG=${GITHUB_SHA::7}
-            
-            # Update dev values.yaml
-            sed -i "s|tag: \".*\"|tag: \"$VERSION-$IMAGE_TAG\"|" argocd/apps/todo-app/overlays/dev/values.yaml
-            
-            # Update UAT values.yaml
-            sed -i "s|tag: \".*\"|tag: \"$VERSION\"|" argocd/apps/todo-app/overlays/uat/values.yaml
-            
-            # Update prod values.yaml
-            sed -i "s|tag: \".*\"|tag: \"$VERSION\"|" argocd/apps/todo-app/overlays/prod/values.yaml
-      - name: Commit and push tags to argoCD overlays
+      - name: Update, Commit and push tags to argoCD overlays
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          VERSION=$(cat version)
+          IMAGE_TAG=${GITHUB_SHA::7}
+
+          # Update dev values.yaml
+          sed -i "s|tag: \".*\"|tag: \"$VERSION-$IMAGE_TAG\"|" argocd/apps/todo-app/overlays/dev/values.yaml
+          
+          # Update UAT values.yaml
+          sed -i "s|tag: \".*\"|tag: \"$VERSION\"|" argocd/apps/todo-app/overlays/uat/values.yaml
+          
+          # Update prod values.yaml
+          sed -i "s|tag: \".*\"|tag: \"$VERSION\"|" argocd/apps/todo-app/overlays/prod/values.yaml
+
           git add argocd/apps/todo-app/overlays/dev/values.yaml
           git add argocd/apps/todo-app/overlays/uat/values.yaml
           git add argocd/apps/todo-app/overlays/prod/values.yaml
+
           git commit -m "Update image tags in Helm values.yaml files [skip ci]" || echo "No changes to commit"
           git push origin HEAD:feature
 
