@@ -1,7 +1,6 @@
 name: Deploy Todo App to Dev Environment
 
 on: 
-  workflow_dispatch: {}
   push:
     branches: ["feature"]
     paths:
