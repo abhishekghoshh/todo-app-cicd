@@ -1,0 +1,119 @@
+site_name: Todo App CI/CD Pipeline
+site_description: A comprehensive GitOps-powered CI/CD pipeline for a modern Go-based Todo application
+site_author: Abhishek Ghosh
+site_url: https://github.com/abhishekghoshh/todo-app-cicd
+
+repo_name: abhishekghoshh/todo-app-cicd
+repo_url: https://github.com/abhishekghoshh/todo-app-cicd
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Quick Start: getting-started.md
+      - Prerequisites: getting-started.md#prerequisites
+      - Local Development: getting-started.md#local-development-setup
+  - Architecture:
+      - Project Structure: project-structure.md
+      - Core Components: project-structure.md#core-components
+      - Design Decisions: project-structure.md#key-design-decisions
+  - Deployment:
+      - Deployment Scripts: deployment-scripts.md
+      - application.yaml: deployment-scripts.md#applicationyaml---argocd-root-application
+      - argo-deploy.sh: deployment-scripts.md#argo-deploysh---automated-deployment-script
+      - enable-helm.sh: deployment-scripts.md#enable-helmsh---helm-integration-setup
+  - CI/CD:
+      - Workflows Overview: cicd-workflows.md
+      - Docker Pipeline: cicd-workflows.md#workflow-1-docker-image-pipeline
+      - Helm Pipeline: cicd-workflows.md#workflow-2-helm-chart-pipeline
+      - Sync Pipeline: cicd-workflows.md#workflow-3-argocd-sync-pipeline
+      - Loop Prevention: cicd-workflows.md#preventing-infinite-loops
+  - Configuration:
+      - Environment Management: configuration.md
+      - Base Configuration: configuration.md#base-configuration
+      - Environment Overlays: configuration.md#environment-overlays
+      - Customization: configuration.md#customization-examples
+  - Operations:
+      - Monitoring: monitoring.md
+      - Troubleshooting: monitoring.md#common-issues-and-solutions
+      - Health Checks: monitoring.md#health-checks
+      - Rollback: monitoring.md#rollback-procedures
+  - Production:
+      - Production Features: production-features.md
+      - High Availability: production-features.md#high-availability
+      - Security: production-features.md#security-implementation
+      - Performance: production-features.md#performance-optimization
+  - Learning:
+      - Learning Outcomes: learning-outcomes.md
+      - Cloud-Native Patterns: learning-outcomes.md#modern-cloud-native-patterns
+      - Best Practices: learning-outcomes.md#production-ready-practices
+      - Career Skills: learning-outcomes.md#career-ready-skills
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - tags
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/abhishekghoshh
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/abhishek1009
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Copyright &copy; 2025 Abhishek Ghosh

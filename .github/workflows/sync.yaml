@@ -5,6 +5,7 @@ on:
       - feature
     paths:
       - 'argocd/**'
+      - 'application.yaml'
 
 jobs:
   create_pull_request:

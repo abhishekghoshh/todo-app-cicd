@@ -17,6 +17,8 @@ on:
       - 'go.mod'
       - 'go.sum'
       - 'version'
+      - README.md
+      - application.yaml
 
 
 

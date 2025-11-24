@@ -1,5 +1,15 @@
 
 services:
+  todo-app-cicd-docs:
+    container_name: todo-app-cicd-docs
+    image: abhishek1009/todo-app-cicd-docs:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/workspace/docs
   # The Go Application
   todo-app:
     container_name: todo-app

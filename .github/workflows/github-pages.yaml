@@ -1,0 +1,26 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: ["feature"]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/ci.yml'
+      - mkdocs.yml
+      - requirements.txt
+      
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - uses: actions/cache@v4
+        with:
+          key: ${{ github.ref }}
+          path: .cache
+      - run: pip install -r requirements.txt
+      - run: mkdocs gh-deploy --force
