@@ -77,9 +77,6 @@ jobs:
             # Update prod values.yaml
             sed -i "s|tag: \".*\"|tag: \"$VERSION\"|" argocd/apps/todo-app/overlays/prod/values.yaml
       - name: Commit and push tags to argoCD overlays
-        env:
-          # Ensure the GH_ACCESS_TOKEN is available for the push command
-          GITHUB_TOKEN: ${{ env.GH_ACCESS_TOKEN }} 
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"

@@ -1,6 +1,7 @@
 name: Deploy Todo App to Dev Environment
 
 on: 
+  workflow_dispatch: {}
   push:
     branches: ["feature"]
     paths:
@@ -9,6 +10,12 @@ on:
 jobs:
   deploy_to_dev:
     runs-on: ubuntu-latest
+    env:
+      HEAD_BRANCH: "feature"
+      BASE_BRANCH: "dev"
+      COMMIT_MSG: ${{ github.event.head_commit.message }}
+      REPO_OWNER: ${{ github.repository_owner }} 
+      GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
     permissions:
       contents: read
       pull-requests: write
@@ -18,13 +25,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create or Update Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-          HEAD_BRANCH: "feature"
-          BASE_BRANCH: "dev"
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-          # Gets the username of the repository owner
-          REPO_OWNER: ${{ github.repository_owner }} 
         run: |
           # 1. Check if a PR already exists
           PR_NUMBER=$(gh pr list \
