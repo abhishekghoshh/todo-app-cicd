@@ -115,6 +115,9 @@ jobs:
             --state open \
             --json number \
             -q '.[0].number')
+          
+          DETAILED_COMMIT_MESSAGE="Docker image updated with version $VERSION-$IMAGE_TAG 
+          Commit message : $COMMIT_MSG"
 
           if [ -z "$PR_NUMBER" ]; then
             # --- CASE A: Create new PR and Assign ---
@@ -124,7 +127,7 @@ jobs:
               --base "$BASE_BRANCH" \
               --head "$HEAD_BRANCH" \
               --title "Deploy changes from $HEAD_BRANCH to $BASE_BRANCH" \
-              --body "$COMMIT_MSG" \
+              --body "$DETAILED_COMMIT_MESSAGE" \
               --assignee "$REPO_OWNER"
 
           else
@@ -133,8 +136,7 @@ jobs:
             
             CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
             
-            NEW_BODY="Docker image updated with version $VERSION-$IMAGE_TAG 
-            Commit message : $COMMIT_MSG
+            NEW_BODY="$DETAILED_COMMIT_MESSAGE
 
             $CURRENT_BODY"
             
