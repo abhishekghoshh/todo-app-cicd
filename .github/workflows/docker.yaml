@@ -30,6 +30,12 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.APP_IMAGE_NAME }}
       # IMAGE_TAG: ${{ github.sha }}
+      HEAD_BRANCH: "feature"
+      BASE_BRANCH: "dev"
+      COMMIT_MSG: ${{ github.event.head_commit.message }}
+      REPO_OWNER: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
+      GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,7 +72,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
       - name: Update, Commit and push tags to argoCD overlays
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }} 
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -74,7 +80,7 @@ jobs:
           VERSION=$(cat version)
           IMAGE_TAG=${GITHUB_SHA::7}
 
-          git pull --rebase origin feature
+          git pull --rebase origin $HEAD_BRANCH
 
           # Update dev values.yaml
           sed -i "s|tag: \".*\"|tag: \"$VERSION-$IMAGE_TAG\"|" argocd/apps/todo-app/overlays/dev/values.yaml
@@ -90,6 +96,50 @@ jobs:
           git add argocd/apps/todo-app/overlays/prod/values.yaml
 
           git commit -m "Update image tags in Helm values.yaml files [skip ci]" || echo "No changes to commit"
-          git push origin HEAD:feature
+          git push origin HEAD:$HEAD_BRANCH
+      - name: Create or Update Pull Request
+        env:
+          HEAD_BRANCH: ${{ env.HEAD_BRANCH }}
+          BASE_BRANCH: ${{ env.BASE_BRANCH }}
+          COMMIT_MSG: ${{ env.COMMIT_MSG }}
+          REPO_OWNER: ${{ env.REPO_OWNER }} 
+          GH_TOKEN: ${{ env.GH_TOKEN }}
+        run: |
+          # 1. Check if a PR already exists
+          PR_NUMBER=$(gh pr list \
+            --base "$BASE_BRANCH" \
+            --head "$HEAD_BRANCH" \
+            --state open \
+            --json number \
+            -q '.[0].number')
+
+          if [ -z "$PR_NUMBER" ]; then
+            # --- CASE A: Create new PR and Assign ---
+            echo "No existing PR found. Creating a new one."
+            
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head "$HEAD_BRANCH" \
+              --title "Deploy changes from $HEAD_BRANCH to $BASE_BRANCH" \
+              --body "$COMMIT_MSG" \
+              --assignee "$REPO_OWNER"
+
+          else
+            # --- CASE B: Update PR Body and Ensure Assignment ---
+            echo "Found existing PR #$PR_NUMBER. Appending commit message."
+            
+            CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
+            
+            NEW_BODY="$CURRENT_BODY
+
+            ---
+            **Update:** $COMMIT_MSG"
+            
+            # Update body AND ensure the owner is assigned
+            gh pr edit "$PR_NUMBER" \
+              --body "$NEW_BODY" \
+              --add-assignee "$REPO_OWNER"
+          fi
+
 
 
