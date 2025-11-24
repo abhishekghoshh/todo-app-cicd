@@ -105,6 +105,9 @@ jobs:
           REPO_OWNER: ${{ env.REPO_OWNER }} 
           GH_TOKEN: ${{ env.GH_TOKEN }}
         run: |
+          VERSION=$(cat version)
+          IMAGE_TAG=${GITHUB_SHA::7}
+
           # 1. Check if a PR already exists
           PR_NUMBER=$(gh pr list \
             --base "$BASE_BRANCH" \
@@ -130,10 +133,10 @@ jobs:
             
             CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
             
-            NEW_BODY="$CURRENT_BODY
+            NEW_BODY="Docker image updated with version $VERSION-$IMAGE_TAG 
+            Commit message : $COMMIT_MSG
 
-            ---
-            **Update:** $COMMIT_MSG"
+            $CURRENT_BODY"
             
             # Update body AND ensure the owner is assigned
             gh pr edit "$PR_NUMBER" \
