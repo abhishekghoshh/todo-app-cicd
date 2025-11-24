@@ -2,6 +2,7 @@ nameOverride: "todo-app"
 
 deployment:
   app:
+    replicas: 2
     image:
       tag: "1.0.0-a6319c6"
     expose:
