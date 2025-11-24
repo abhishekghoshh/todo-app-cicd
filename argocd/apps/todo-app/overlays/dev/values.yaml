@@ -3,7 +3,7 @@ nameOverride: "todo-app"
 deployment:
   app:
     image:
-      tag: "1.0.0-e7fa8c8"
+      tag: "1.0.0-b6f50b2"
     expose:
       host: "app.todo.local"
   db:
