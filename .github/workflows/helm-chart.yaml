@@ -12,9 +12,7 @@ on:
     branches: ["feature"]
     paths:
       - 'helm/**'
-      - .github/workflows/helm-chart.yaml
-  # pull_request:
-  #   branches: ["dev", "uat", "prod"]
+      - '.github/workflows/helm-chart.yaml'
 
 
 jobs:
@@ -62,6 +60,35 @@ jobs:
 
           helm package helm --version $CHART_VERSION_FROM_COMMIT --destination ./packages
           helm push ./packages/$CHART_NAME-$CHART_VERSION_FROM_COMMIT.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+      - name: Commit and push tags to argoCD Kustomization overlays
+        env:
+          # Ensure the GH_ACCESS_TOKEN is available for the push command
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Find chart name from Chart.yaml and remove quotes from chart name if any
+          CHART_NAME=$(grep 'name:' helm/Chart.yaml | awk '{print $2}')
+          CHART_NAME=${CHART_NAME//\"/}
+
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          # Update dev kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION|" argocd/apps/todo-app/overlays/dev/kustomization.yaml
+
+          # strip the github sha to first 7 characters and append to chart version
+          CHART_VERSION_FROM_COMMIT=${GITHUB_SHA::7}
+          CHART_VERSION_FROM_COMMIT="$CHART_VERSION-$CHART_VERSION_FROM_COMMIT"
+
+          # update uat and prod kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION_FROM_COMMIT|" argocd/apps/todo-app/overlays/uat/kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION_FROM_COMMIT|" argocd/apps/todo-app/overlays/prod/kustomization.yaml
+          
+          git commit -m "Update helm chart version to $CHART_VERSION in kustomization overlays"
+          git push origin HEAD:feature 
 
 
 

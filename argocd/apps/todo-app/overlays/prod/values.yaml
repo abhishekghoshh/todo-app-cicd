@@ -2,6 +2,8 @@ nameOverride: "todo-app"
 
 deployment:
   app:
+    image:
+      tag: "latest"
     expose:
       host: "app.todo.local"
   db:

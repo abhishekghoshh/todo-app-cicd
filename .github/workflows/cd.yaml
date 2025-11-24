@@ -1,0 +1,63 @@
+name: Deploy Todo App to Dev Environment
+
+on: 
+  push:
+    branches: ["feature"]
+    paths:
+      - 'argocd/**'
+
+jobs:
+  deploy_to_dev:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create or Update Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          HEAD_BRANCH: "feature"
+          BASE_BRANCH: "dev"
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          # Gets the username of the repository owner
+          REPO_OWNER: ${{ github.repository_owner }} 
+        run: |
+          # 1. Check if a PR already exists
+          PR_NUMBER=$(gh pr list \
+            --base "$BASE_BRANCH" \
+            --head "$HEAD_BRANCH" \
+            --state open \
+            --json number \
+            -q '.[0].number')
+
+          if [ -z "$PR_NUMBER" ]; then
+            # --- CASE A: Create new PR and Assign ---
+            echo "No existing PR found. Creating a new one."
+            
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head "$HEAD_BRANCH" \
+              --title "Deploy changes from $HEAD_BRANCH to $BASE_BRANCH" \
+              --body "$COMMIT_MSG" \
+              --assignee "$REPO_OWNER"
+
+          else
+            # --- CASE B: Update PR Body and Ensure Assignment ---
+            echo "Found existing PR #$PR_NUMBER. Appending commit message."
+            
+            CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
+            
+            NEW_BODY="$CURRENT_BODY
+
+            ---
+            **Update:** $COMMIT_MSG"
+            
+            # Update body AND ensure the owner is assigned
+            gh pr edit "$PR_NUMBER" \
+              --body "$NEW_BODY" \
+              --add-assignee "$REPO_OWNER"
+          fi
