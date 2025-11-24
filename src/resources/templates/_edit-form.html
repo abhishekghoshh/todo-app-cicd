@@ -1,0 +1,24 @@
+<form id="todo-{{.ID.Hex}}" class="edit-form"
+      hx-put="/todos/{{.ID.Hex}}"
+      hx-target="#todo-{{.ID.Hex}}"
+      hx-swap="outerHTML">
+
+    <h3>Edit Todo</h3>
+    <div>
+        <label>Title</label>
+        <input type="text" name="title" value="{{.Title}}" required>
+    </div>
+    <div>
+        <label>Content</label>
+        <textarea name="content" rows="3">{{.Content}}</textarea>
+    </div>
+    <div class="todo-controls">
+        <button type="submit" class="btn-save">Save</button>
+        <button type="button" class="btn-cancel"
+                hx-get="/todos/{{.ID.Hex}}/item"
+                hx-target="#todo-{{.ID.Hex}}"
+                hx-swap="outerHTML">
+            Cancel
+        </button>
+    </div>
+</form>

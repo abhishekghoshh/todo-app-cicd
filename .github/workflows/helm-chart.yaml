@@ -1,0 +1,157 @@
+## See this video for refference : https://www.youtube.com/watch?v=x7f9x30W_dI
+
+
+# This workflow builds and pushes a Docker image to Docker Hub
+name: Build and Push Todo App helm chart to docker Helm Registry
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on: 
+  # workflow_dispatch: {}
+  push:
+    branches: ["feature"]
+    paths:
+      - 'helm/**'
+      - '.github/workflows/helm-chart.yaml'
+
+
+jobs:
+  publish_helm_chart:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      HELM_REGISTRY: ${{ vars.HELM_REGISTRY }}
+      HELM_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      HEAD_BRANCH: "feature"
+      BASE_BRANCH: "dev"
+      COMMIT_MSG: ${{ github.event.head_commit.message }}
+      REPO_OWNER: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
+      GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push the helm chart with version from chart.yaml
+        run: |
+          # Find chart name from Chart.yaml and remove quotes from chart name if any
+          CHART_NAME=$(grep 'name:' helm/Chart.yaml | awk '{print $2}')
+          CHART_NAME=${CHART_NAME//\"/}
+
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          helm package helm --destination ./packages
+          helm push ./packages/$CHART_NAME-$CHART_VERSION.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+
+      - name: Build and push the helm chart with commit sha as version
+        run: |
+          # Find chart name from Chart.yaml and remove quotes from chart name if any
+          CHART_NAME=$(grep 'name:' helm/Chart.yaml | awk '{print $2}')
+          CHART_NAME=${CHART_NAME//\"/}
+
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          # strip the github sha to first 7 characters and append to chart version
+          CHART_VERSION_WITH_COMMIT_ID=${GITHUB_SHA::7}
+          CHART_VERSION_WITH_COMMIT_ID="$CHART_VERSION-$CHART_VERSION_WITH_COMMIT_ID"
+
+          helm package helm --version $CHART_VERSION_WITH_COMMIT_ID --destination ./packages
+          helm push ./packages/$CHART_NAME-$CHART_VERSION_WITH_COMMIT_ID.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
+      - name: Update, Commit and push tags to argoCD Kustomization overlays
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }} 
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          # strip the github sha to first 7 characters and append to chart version
+          CHART_VERSION_WITH_COMMIT_ID=${GITHUB_SHA::7}
+          CHART_VERSION_WITH_COMMIT_ID="$CHART_VERSION-$CHART_VERSION_WITH_COMMIT_ID"
+          
+          git pull --rebase origin $HEAD_BRANCH
+
+          # Update dev kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION_WITH_COMMIT_ID|" argocd/apps/todo-app/overlays/dev/kustomization.yaml
+
+          # update uat and prod kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION|" argocd/apps/todo-app/overlays/uat/kustomization.yaml
+          sed -i "s|version: .*|version: $CHART_VERSION|" argocd/apps/todo-app/overlays/prod/kustomization.yaml
+
+          git add argocd/apps/todo-app/overlays/dev/kustomization.yaml
+          git add argocd/apps/todo-app/overlays/uat/kustomization.yaml
+          git add argocd/apps/todo-app/overlays/prod/kustomization.yaml
+
+          git commit -m "Update helm chart version to $CHART_VERSION_WITH_COMMIT_ID in kustomization overlays"
+          git push origin HEAD:$HEAD_BRANCH
+      - name: Create or Update Pull Request
+        env:
+          HEAD_BRANCH: ${{ env.HEAD_BRANCH }}
+          BASE_BRANCH: ${{ env.BASE_BRANCH }}
+          COMMIT_MSG: ${{ env.COMMIT_MSG }}
+          REPO_OWNER: ${{ env.REPO_OWNER }} 
+          GH_TOKEN: ${{ env.GH_TOKEN }}
+        run: |
+          # 1. Check if a PR already exists
+          # Find chart version from Chart.yaml and # remove quotes from version if any
+          CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
+          CHART_VERSION=${CHART_VERSION//\"/}
+
+          # strip the github sha to first 7 characters and append to chart version
+          CHART_VERSION_WITH_COMMIT_ID=${GITHUB_SHA::7}
+          CHART_VERSION_WITH_COMMIT_ID="$CHART_VERSION-$CHART_VERSION_WITH_COMMIT_ID"
+
+          PR_NUMBER=$(gh pr list \
+            --base "$BASE_BRANCH" \
+            --head "$HEAD_BRANCH" \
+            --state open \
+            --json number \
+            -q '.[0].number')
+          
+          DETAILED_COMMIT_MESSAGE="Helm Chart updated with version $CHART_VERSION_WITH_COMMIT_ID 
+          Commit message : $COMMIT_MSG"
+          
+          if [ -z "$PR_NUMBER" ]; then
+            # --- CASE A: Create new PR and Assign ---
+            echo "No existing PR found. Creating a new one."
+            
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head "$HEAD_BRANCH" \
+              --title "Deploy changes from $HEAD_BRANCH to $BASE_BRANCH" \
+              --body "$DETAILED_COMMIT_MESSAGE" \
+              --assignee "$REPO_OWNER"
+
+          else
+            # --- CASE B: Update PR Body and Ensure Assignment ---
+            echo "Found existing PR #$PR_NUMBER. Appending commit message."
+            
+            CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q .body)
+            
+            NEW_BODY="$DETAILED_COMMIT_MESSAGE
+
+            $CURRENT_BODY"
+            
+            # Update body AND ensure the owner is assigned
+            gh pr edit "$PR_NUMBER" \
+              --body "$NEW_BODY" \
+              --add-assignee "$REPO_OWNER"
+          fi
+
+
+

@@ -1,0 +1,29 @@
+{{- if .Values.deployment.db.expose.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "todo-app-chart.mongodb.fullname" . }}-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # This annotation specifies the Nginx Ingress controller
+    kubernetes.io/ingress.class: {{ .Values.deployment.db.expose.ingressType }}
+    
+    # --- Additional user-defined annotations
+{{- with .Values.deployment.db.expose.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  ingressClassName: {{ .Values.deployment.db.expose.ingressType }}
+  rules:
+    - host: {{ .Values.deployment.db.expose.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # This points to the service from 03-mongo-service.yaml
+                name: {{ include "todo-app-chart.mongodb.fullname" . }}-svc
+                port:
+                  number: {{ .Values.deployment.db.port }}
+{{- end }}

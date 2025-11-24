@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-application
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  source:
+    repoURL: https://github.com/abhishekghoshh/todo-app-cicd
+    targetRevision: ${targetEnvironment}
+    path: argocd/argo-apps/${targetEnvironment}
+    # directory:
+    #   recurse: true
+    #   jsonnet: {}
+    #   exclude: '{**/apps/**,**/argo-apps/**}'
+  sources: []
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

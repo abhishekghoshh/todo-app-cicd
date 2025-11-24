@@ -1,0 +1,54 @@
+
+services:
+  # The Go Application
+  todo-app:
+    container_name: todo-app
+    image: abhishek1009/todo-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: .
+          action: rebuild
+    ports:
+      - "8080:8080" # Map host port 8080 to container port 8080
+    volumes:
+      # Mount the 'uploads' directory to persist image files
+      - ./uploads:/app/uploads
+    environment:
+      # Pass the MONGO_URI from the .env file
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongodb # Wait for the mongo service to be ready
+    restart: unless-stopped
+    networks:
+      - todo-network
+
+  # The MongoDB Database
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      # Persist database data
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    command:
+      - --storageEngine
+      - wiredTiger
+      - --auth
+    restart: unless-stopped
+    networks:
+      - todo-network
+
+volumes:
+  # Define the named volume for MongoDB data
+  mongo-data:
+
+networks:
+  todo-network:
+    driver: bridge
