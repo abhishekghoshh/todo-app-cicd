@@ -25,7 +25,6 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       HELM_REGISTRY: ${{ vars.HELM_REGISTRY }}
       HELM_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-      GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -64,6 +63,8 @@ jobs:
           helm package helm --version $CHART_VERSION_FROM_COMMIT --destination ./packages
           helm push ./packages/$CHART_NAME-$CHART_VERSION_FROM_COMMIT.tgz oci://$HELM_REGISTRY/$HELM_USERNAME
       - name: Update, Commit and push tags to argoCD Kustomization overlays
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
