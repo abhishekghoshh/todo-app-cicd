@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$1" ]; then
-  echo "❌ Please provide an environment: dev | stage | prod"
+  echo "❌ Please provide an environment: dev | uat | prod"
   echo "Or provide destroy to uninstall ArgoCD"
   exit 1
 fi

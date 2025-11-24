@@ -8,6 +8,7 @@ spec:
   source:
     repoURL: https://github.com/abhishekghoshh/todo-app-cicd
     targetRevision: dev
+    ref: argorepo
     path: argocd/apps/todo-app/overlays/dev
     directory:
       recurse: true
