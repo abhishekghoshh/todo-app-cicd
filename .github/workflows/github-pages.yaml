@@ -4,7 +4,7 @@ on:
     branches: ["feature"]
     paths:
       - 'docs/**'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/github-pages.yml'
       - mkdocs.yml
       - requirements.txt
       
