@@ -123,13 +123,14 @@ jobs:
             --json number \
             -q '.[0].number')
           
+          DETAILED_COMMIT_MESSAGE="Helm Chart updated with version $CHART_VERSION_WITH_COMMIT_ID 
+          Commit message : $COMMIT_MSG"
           
           if [ -z "$PR_NUMBER" ]; then
             # --- CASE A: Create new PR and Assign ---
             echo "No existing PR found. Creating a new one."
             
-            DETAILED_COMMIT_MESSAGE="Helm Chart updated with version $CHART_VERSION_WITH_COMMIT_ID 
-            Commit message : $COMMIT_MSG"
+            
             
             gh pr create \
               --base "$BASE_BRANCH" \
