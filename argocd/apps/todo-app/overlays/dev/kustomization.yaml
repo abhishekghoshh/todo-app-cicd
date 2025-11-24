@@ -12,7 +12,7 @@ transformers: []
 helmCharts:
   - name: todo-app-chart
     repo: https://registry-1.docker.io/abhishek1009
-    version: 1.0.0-42de8f2
+    version: 1.0.0-e51580e
     namespace: todo-app
     # base values file
     valuesFile: ../../base/values.yaml
