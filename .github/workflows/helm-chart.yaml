@@ -67,7 +67,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
+          
           # Find chart version from Chart.yaml and # remove quotes from version if any
           CHART_VERSION=$(grep 'version:' helm/Chart.yaml | awk '{print $2}')
           CHART_VERSION=${CHART_VERSION//\"/}
@@ -75,6 +75,8 @@ jobs:
           # strip the github sha to first 7 characters and append to chart version
           CHART_VERSION_FROM_COMMIT=${GITHUB_SHA::7}
           CHART_VERSION_FROM_COMMIT="$CHART_VERSION-$CHART_VERSION_FROM_COMMIT"
+          
+          git pull --rebase origin feature
 
           # Update dev kustomization.yaml
           sed -i "s|version: .*|version: $CHART_VERSION_FROM_COMMIT|" argocd/apps/todo-app/overlays/dev/kustomization.yaml

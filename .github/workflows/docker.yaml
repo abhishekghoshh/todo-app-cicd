@@ -73,6 +73,8 @@ jobs:
           VERSION=$(cat version)
           IMAGE_TAG=${GITHUB_SHA::7}
 
+          git pull --rebase origin feature
+
           # Update dev values.yaml
           sed -i "s|tag: \".*\"|tag: \"$VERSION-$IMAGE_TAG\"|" argocd/apps/todo-app/overlays/dev/values.yaml
           
