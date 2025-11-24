@@ -5,7 +5,7 @@ on:
     branches: ["feature"]
     paths:
       - 'docs/**'
-      - '.github/workflows/github-pages.yml'
+      - '.github/workflows/github-pages.yaml'
       - mkdocs.yml
       - requirements.txt
       
