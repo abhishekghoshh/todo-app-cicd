@@ -10,8 +10,8 @@ spec:
     targetRevision: dev
     ref: argorepo
     path: argocd/apps/todo-app/overlays/dev
-    directory:
-      recurse: true
+    kustomize:
+      enableHelm: true
   destination:
     server: https://kubernetes.default.svc
     namespace: todo-app
