@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +40,13 @@ func main() {
 	mux := http.NewServeMux()
 
 	// --- Public Routes ---
+
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		version, _ := os.ReadFile("version")
+		response := map[string]string{"status": "ok", "version": string(version)}
+		json.NewEncoder(w).Encode(response)
+	})
 
 	// Static file server for images
 	// We specify "GET" to make the pattern non-conflicting (Go 1.22+)
