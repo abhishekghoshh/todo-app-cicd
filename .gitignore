@@ -37,3 +37,4 @@ helm/**.tgz
 argocd/**/charts/**
 
 .cache/
+.DS_Store
