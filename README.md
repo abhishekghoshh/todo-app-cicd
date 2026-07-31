@@ -2,6 +2,11 @@
 
 A comprehensive **GitOps-powered CI/CD pipeline** for a modern Go-based Todo application with complete Kubernetes deployment automation using ArgoCD, Helm, and GitHub Actions.
 
+## Referrence
+
+- [Simplifying Argo CD Deployments with Kustomize: 10 Benefits and 3 AWS Scenarios](https://devopsarcheologicst.medium.com/simplifying-argo-cd-deployments-with-kustomize-10-benefits-and-3-aws-scenarios-ec6494ffd7fc)
+
+
 ## 📚 Documentation
 
 Complete documentation is available in the `docs/` directory and can be viewed using MkDocs:
